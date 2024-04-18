@@ -9,9 +9,9 @@ const chatIDs = new Map();
 const token = process.env.TELEGRAM_TOKEN;
 let heroes = {};
 let stats = {
-  PlayWithFriend: 0,
-  PlayWithoutFriend: 0,
-  PlayWithFriendWins: 0,
+  PlayWithFriend: 12,
+  PlayWithoutFriend: 3,
+  PlayWithFriendWins: 6,
   PlayWithFriendLosses: 0,
   PlayWithoutFriendWins: 0,
   PlayWithoutFriendLosses: 0,
@@ -58,28 +58,57 @@ async function fetchLastMatchStats(playerID) {
     const response = await fetch(url);
     const recentMatches = await response.json();
 
-    if (recentMatches.length > 0) {
-      const matchID = recentMatches[0].match_id;
+    if (
+      recentMatches.length > 0 &&
+      recentMatches[0].match_id !== lastCheckedMatchID
+    ) {
+      const match = recentMatches[0];
+      lastCheckedMatchID = match.match_id; // Обновляем ID последнего обработанного матча
+      const matchID = match.match_id;
       const playerNames = await fetchMatchDetails(matchID);
+      let playerName = "";
       if (playerNames.length > 0) {
-        recentMatches[0].playerName = playerNames.join(", ");
+        playerName = playerNames.join(", ");
       }
-      return new Match(
-        recentMatches[0].match_id,
-        recentMatches[0].hero_id,
-        recentMatches[0].kills,
-        recentMatches[0].deaths,
-        recentMatches[0].assists,
-        recentMatches[0].radiant_win,
-        recentMatches[0].player_slot,
-        recentMatches[0].playerName
+      const newMatch = new Match(
+        match.match_id,
+        match.hero_id,
+        match.kills,
+        match.deaths,
+        match.assists,
+        match.radiant_win,
+        match.player_slot,
+        playerName
       );
+
+      updateStats(newMatch, playerNames.length > 0); // Обновляем статистику
+      return newMatch;
     }
   } catch (error) {
     console.error("Error fetching or parsing recent matches data:", error);
     return new Match();
   }
   return new Match();
+}
+
+function updateStats(match, playedWithFriend) {
+  const didWin = match.radiantWin == match.playerSlot < 128;
+
+  if (playedWithFriend) {
+    stats.PlayWithFriend++;
+    if (didWin) {
+      stats.PlayWithFriendWins++;
+    } else {
+      stats.PlayWithFriendLosses++;
+    }
+  } else {
+    stats.PlayWithoutFriend++;
+    if (didWin) {
+      stats.PlayWithoutFriendWins++;
+    } else {
+      stats.PlayWithoutFriendLosses++;
+    }
+  }
 }
 
 async function fetchMatchDetails(matchID) {
@@ -93,6 +122,9 @@ async function fetchMatchDetails(matchID) {
       "Fun* [2nd]",
       "Fun* [rzns]",
       "Iлюха Звiр",
+      "SpivaK",
+      "Ȼαþĭϯαņ Ǥѡƴȡĭøņ",
+      "YobyDal",
     ]);
     const playerNames = matchDetails.players
       .filter((player) => validNames.has(player.personaname))
@@ -128,16 +160,16 @@ function formatMatchStats(match, stats) {
 
   return (
     `Vlados last match stats:\n` +
-    `Hero - ${heroName}\n` +
+    `Герой - ${heroName}\n` +
     `K/D/A - ${match.kills}/${match.deaths}/${
       match.assists
     } (KDA: ${kda.toFixed(2)})\n` +
-    `Result(TEST) - ${result}\n` +
-    `Played with - ${match.playerName}\n` +
-    `Total games with friends: ${stats.PlayWithFriend}\n` +
-    `Total games without friends: ${stats.PlayWithoutFriend}\n` +
-    `Win rate with friends: ${playWithFriendRate.toFixed(2)}%\n` +
-    `Win rate without friends: ${playWithoutFriendRate.toFixed(2)}%`
+    `Результат - ${result}\n` +
+    `Забущен кем - ${match.playerName}\n` +
+    `Всего игр с друзьями: ${stats.PlayWithFriend}\n` +
+    `Всего игр без друзей: ${stats.PlayWithoutFriend}\n` +
+    `Win rate играя с друзьями: ${playWithFriendRate.toFixed(2)}%\n` +
+    `Win rate играя без друзей: ${playWithoutFriendRate.toFixed(2)}%`
   );
 }
 
@@ -162,9 +194,9 @@ class Match {
   ) {
     this.matchID = matchID;
     this.heroID = heroID;
-    this.kills = kills;
-    this.deaths = deaths;
-    this.assists = assists;
+    this.kills = kills || 0; // Добавьте значения по умолчанию, чтобы избежать undefined
+    this.deaths = deaths || 0;
+    this.assists = assists || 0;
     this.radiantWin = radiantWin;
     this.playerSlot = playerSlot;
     this.playerName = playerName;
