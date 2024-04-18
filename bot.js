@@ -144,21 +144,29 @@ function formatMatchStats(match, stats) {
   const heroName = heroes[match.heroID]
     ? heroes[match.heroID].localizedName
     : "Unknown";
+  const isRadiant = match.playerSlot < 128;
+  const didWin =
+    (isRadiant && match.radiantWin) || (!isRadiant && !match.radiantWin);
   const kda =
     match.deaths === 0
       ? match.kills + match.assists
       : (match.kills + match.assists) / match.deaths;
-  const result = match.radiantWin == match.playerSlot < 128 ? "won" : "lost";
-  const playWithFriendRate =
+
+  // Проверка и установка значений процентов
+  let playWithFriendRate =
     stats.PlayWithFriend > 0
-      ? ((stats.PlayWithFriendWins / stats.PlayWithFriend) * 100).toFixed(2)
-      : "0.00";
-  const playWithoutFriendRate =
+      ? (stats.PlayWithFriendWins / stats.PlayWithFriend) * 100
+      : 0;
+  let playWithoutFriendRate =
     stats.PlayWithoutFriend > 0
-      ? ((stats.PlayWithoutFriendWins / stats.PlayWithoutFriend) * 100).toFixed(
-          2
-        )
-      : "0.00";
+      ? (stats.PlayWithoutFriendWins / stats.PlayWithoutFriend) * 100
+      : 0;
+
+  // Используйте Number для гарантии числового значения
+  playWithFriendRate = Number(playWithFriendRate.toFixed(2));
+  playWithoutFriendRate = Number(playWithoutFriendRate.toFixed(2));
+
+  const result = didWin ? "won" : "lost";
 
   return (
     `Vlados last match stats:\n` +
