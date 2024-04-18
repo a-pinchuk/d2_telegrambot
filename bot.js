@@ -99,6 +99,9 @@ async function fetchMatchDetails(matchID) {
       "Fun* [2nd]",
       "Fun* [rzns]",
       "Iлюха Звiр",
+      "SpivaK",
+      "Ȼαþĭϯαņ Ǥѡƴȡĭøņ",
+      "YobyDal",
     ]);
     const playerNames = matchDetails.players
       .filter((player) => validNames.has(player.personaname))
