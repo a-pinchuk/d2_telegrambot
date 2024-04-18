@@ -178,8 +178,8 @@ function formatMatchStats(match, stats) {
     `Забущен кем - ${match.playerName}\n` +
     `Всего игр с друзьями: ${stats.PlayWithFriend}\n` +
     `Всего игр без друзей: ${stats.PlayWithoutFriend}\n` +
-    `Win rate играя с друзьями: ${playWithFriendRate.toFixed(2)}%\n` +
-    `Win rate играя без друзей: ${playWithoutFriendRate.toFixed(2)}%`
+    `Win rate играя с друзьями: ${playWithFriendRate}%\n` +
+    `Win rate играя без друзей: ${playWithoutFriendRate}%`
   );
 }
 
