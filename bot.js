@@ -162,16 +162,16 @@ function formatMatchStats(match, stats) {
 
   return (
     `Vlados last match stats:\n` +
-    `Hero - ${heroName}\n` +
+    `Герой - ${heroName}\n` +
     `K/D/A - ${match.kills}/${match.deaths}/${
       match.assists
     } (KDA: ${kda.toFixed(2)})\n` +
-    `Result - ${result}\n` +
-    `Played with - ${match.playerName}\n` +
-    `Total games with friends: ${stats.PlayWithFriend}\n` +
-    `Total games without friends: ${stats.PlayWithoutFriend}\n` +
-    `Win rate with friends: ${playWithFriendRate}%\n` +
-    `Win rate without friends: ${playWithoutFriendRate}%`
+    `Результат - ${result}\n` +
+    `Забущен кем - ${match.playerName}\n` +
+    `Всего игр с друзьями: ${stats.PlayWithFriend}\n` +
+    `Всего игр без друзей: ${stats.PlayWithoutFriend}\n` +
+    `Win rate играя с друзьями: ${playWithFriendRate.toFixed(2)}%\n` +
+    `Win rate играя без друзей: ${playWithoutFriendRate.toFixed(2)}%`
   );
 }
 
