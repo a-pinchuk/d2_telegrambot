@@ -23,7 +23,7 @@ TelegramBot.Promise = Promise;
 const bot = new TelegramBot(token, { polling: true });
 loadHeroes();
 
-setInterval(checkForNewMatches, 240000); // Проверяем новые матчи каждые 4 минуты
+setInterval(checkForNewMatches, 60000); // Проверяем новые матчи каждые 4 минуты
 
 bot.on("message", (msg) => {
   if (!msg.text) return;
